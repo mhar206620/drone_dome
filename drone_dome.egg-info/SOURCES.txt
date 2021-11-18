@@ -1,0 +1,12 @@
+README.md
+setup.py
+drone_dome/MakeCoords.py
+drone_dome/MakeDome.py
+drone_dome/MakeKML.py
+drone_dome/PlottingAndSchematics.py
+drone_dome/__init__.py
+drone_dome.egg-info/PKG-INFO
+drone_dome.egg-info/SOURCES.txt
+drone_dome.egg-info/dependency_links.txt
+drone_dome.egg-info/requires.txt
+drone_dome.egg-info/top_level.txt

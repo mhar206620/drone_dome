@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: drone-dome
+Version: 0.1
+Summary: generate a hemispherical gridded flight path for a drone, for import into UGCS autopilot software
+Home-page: UNKNOWN
+Author: Maile Harris
+Author-email: maile.harris@yale.edu
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3
