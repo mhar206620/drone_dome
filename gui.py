@@ -28,66 +28,87 @@ plots = PlottingAndSchematics()
 
 #############################################################################################################################
 
+# initialize the variables with default values
+if 'angle_between_points' not in st.session_state:
+    st.session_state.angle_between_points = 40
+if 'height' not in st.session_state:
+    st.session_state.height = 70
+if 'radius' not in st.session_state:
+    st.session_state.radius = 20
+    
+# initialize the form    
 st.header('Generate Dome')
 
-dome_form = st.form(key='make_dome')
-
-st.session_state.angle_between_points = float(dome_form.text_input(label='angle between points in degrees'))
-st.session_state.height = float(dome_form.text_input(label='height in meters AGL'))
-st.session_state.radius = float(dome_form.text_input(label='radius in meters'))
-
-dome_submit_button = dome_form.form_submit_button(label='Generate Dome')
-
-if dome_submit_button:
+with st.form('make_dome'):
+    # initialize the fields in the form
+    abp = float(st.text_input(label='angle between points in degrees', value=40))
+    h = float(st.text_input(label='height in meters AGL', value=70))
+    r = float(st.text_input(label='radius in meters', value=20))
     
-    # do all the calculations to prepare the dome
-    dome = MakeDome(angle_between_points=st.session_state.angle_between_points, height=st.session_state.height, radius=st.session_state.radius)
+    submitted = st.form_submit_button(label='Generate Dome')
     
-    # generate the dome
-    x, y, z, theta, phi = dome.dome_points()
-    st.session_state.x = x
-    st.session_state.y = y
-    st.session_state.z = z
-    st.session_state.theta = theta
-    st.session_state.phi = phi
-    
-    # rendering the dome in arbitrary space
-    fig_dome, ax_dome = plots.render_dome(x, y, z)
+    if submitted:
+        st.session_state.angle_between_points = abp
+        st.session_state.height = h
+        st.session_state.radius = r
+        
+        # passing all the form variables to the class to make the dome
+        dome = MakeDome(angle_between_points=st.session_state.angle_between_points, height=st.session_state.height, radius=st.session_state.radius)
+        
+        x, y, z, theta, phi = dome.dome_points()
+        st.session_state.x = x
+        st.session_state.y = y
+        st.session_state.z = z
+        st.session_state.theta = theta
+        st.session_state.phi = phi
 
-    # creating the streamlit plot
-    st.pyplot(fig_dome)
+        # rendering the dome in arbitrary space
+        fig_dome, ax_dome = plots.render_dome(x, y, z)
+
+        # creating the streamlit plot
+        st.pyplot(fig_dome)
 
 #############################################################################################################################
 
+# initialize the variables with default values
+if 'latitude' not in st.session_state:
+    st.session_state.latitude = 41.320917
+if 'longitude' not in st.session_state:
+    st.session_state.longitude = -72.921917
+
 st.header('Generate Coordinates')
 
-coords_form = st.form(key='make_coords')
-
-st.session_state.latitude = float(coords_form.text_input('latitude in decimal degrees'))
-st.session_state.longitude = float(coords_form.text_input('longitude in decimal degrees'))
-
-coords_submit_button = coords_form.form_submit_button(label='Generate Coordinates')
-
-if coords_submit_button:
+with st.form('make_coords'):
+    # initialize fields in the form
+    lat = float(st.text_input('latitude in decimal degrees', value=41.320917))
+    lon = float(st.text_input('longitude in decimal degrees', value=-72.921917))
     
-    # do all the calculations to prepare the coordinates
-    coords = MakeCoords(st.session_state.x, st.session_state.y, st.session_state.z, st.session_state.theta, st.session_state.phi, latitude=st.session_state.latitude, longitude=st.session_state.longitude)
+    submitted = st.form_submit_button(label='Generate Coordinates')
+    
+    if submitted: 
+        st.session_state.latitude = lat
+        st.session_state.longitude = lon
+        
+        # passing all the form variables to the class to make the dome
+        # do all the calculations to prepare the coordinates
+        coords = MakeCoords(st.session_state.x, st.session_state.y, st.session_state.z, st.session_state.theta, st.session_state.phi, latitude=st.session_state.latitude, longitude=st.session_state.longitude)
+        
+        # generate the latitude/longitude coordinates of the ring passes
+        df_ring = coords.make_lat_lon_ring()
+        st.session_state.df_ring = df_ring
+        
+        # generate the latitude/longitude coordinates of the arch passes
+        df_arch = coords.make_lat_lon_arch()
+        st.session_state.df_arch = df_arch
+        
+        # plotting the dome grid over a satellite image of the coordinate locations
+        fig_sat, ax_sat = plots.sat_plot(df_ring, df_arch, dish_longitude=st.session_state.longitude, dish_latitude=st.session_state.latitude)
+        
+        # creating the streamlit plot
+        st.pyplot(fig_sat)
+        
+        st.write('NUMBER OF WAYPOINTS = ' + str(len(st.session_state.df_ring)))
 
-    # generate the latitude/longitude coordinates of the ring passes
-    df_ring = coords.make_lat_lon_ring()
-    st.session_state.df_ring = df_ring
-
-    # generate the latitude/longitude coordinates of the arch passes
-    df_arch = coords.make_lat_lon_arch()
-    st.session_state.df_arch = df_arch
-
-    # plotting the dome grid over a satellite image of the coordinate locations
-    fig_sat, ax_sat = plots.sat_plot(df_ring, df_arch, dish_longitude=st.session_state.longitude, dish_latitude=st.session_state.latitude)
-
-    # creating the streamlit plot
-    st.pyplot(fig_sat)
-
-    st.write('NUMBER OF WAYPOINTS = ' + str(len(st.session_state.df_ring)))
 #############################################################################################################################
 
 st.header('Generate KML File')
