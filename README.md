@@ -11,6 +11,9 @@ drone_dome generates these dome grids in three stages: first it generates the do
 This repo is located at https://github.com/mhar206620/drone_dome
 
 To install:
+
+All of the dependencies are pip installable with the package install EXCEPT cartopy. Before installing drone_dome, `conda install -c conda-forge cartopy` in the environment where you want to install drone_dome, then follow the steps below to install drone_dome.
+
 1. In the github repo, click the green "code" button and copy the HTTPS link
 2. Go to your terminal and navigate to the environment/directory where you would like to install drone_dome
 3. In the terminal type `git clone <link you just copied from 1>` and then press enter. This will clone the repo from github and create a local copy of it on your computer, within the current directory. 
